@@ -85,8 +85,8 @@ public class ReflectionProcessor {
     private Object invokeMethod(Object context, String name, String[] parameters) {
         try {
             ArrayList<Object> params = new ArrayList<>();
-            for (int i = 0; i < parameters.length; i++) {
-                Object result = new ReflectionProcessor(parameters[i], this.context).process();
+            for (String parameter : parameters) {
+                Object result = new ReflectionProcessor(parameter, this.context).process();
                 if (result != null) {
                     params.add(result);
                 }
@@ -123,7 +123,7 @@ public class ReflectionProcessor {
             if (!field.isAccessible())
                 field.setAccessible(true);
             return field.get(context);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
         return null;
@@ -211,7 +211,7 @@ public class ReflectionProcessor {
 
             current += c;
         }
-        if (current != "")
+        if (!current.equals(""))
             sections.add(current);
         return sections.toArray(new String[sections.size()]);
     }
