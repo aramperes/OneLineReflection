@@ -42,4 +42,4 @@ new ReflectionProcessor("com.example.foo.MyClass.doSomething()", null).process()
 Disclaimer
 ---
 
-This is for demonstration purposes, some features you might expect are not present, which includes passing parameters in method parantheses.
+This is for demonstration purposes, some features you could expect might or might not be present.
