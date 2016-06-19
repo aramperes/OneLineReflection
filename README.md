@@ -35,7 +35,7 @@ Invoking the method using the utility would be:
 
 ```java
 
-new ReflectionProcessor("com.example.foo.MyClass.doSomething()", null).process().
+new ReflectionProcessor("com.example.foo.MyClass.doSomething()", null).process();
 
 ```
 
