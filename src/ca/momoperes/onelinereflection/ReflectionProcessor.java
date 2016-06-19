@@ -19,21 +19,33 @@ public class ReflectionProcessor {
      * @return the resultant value of the reflective line
      */
     public Object process() {
+        String tmpPackage = "";
         Object cxt = null;
         String[] sections = line.split("\\.");
         for (int i = 0; i < sections.length; i++) {
             String section = sections[i];
-            if (section.equals("$")) {
+            if (section.equals("$") || section.equals("this")) {
                 cxt = context;
             } else if (section.endsWith("()")) { // Method
                 section = section.substring(0, section.length() - 2);
                 if (i == sections.length - 1)
                     return invokeMethod(cxt, section);
                 cxt = invokeMethod(cxt, section);
-            } else { // Field
-                if (i == sections.length - 1)
-                    return invokeField(cxt, section);
-                cxt = invokeField(cxt, section);
+            } else { // Field & Class
+                Object field = invokeField(cxt, section);
+                if (field == null) {
+                    tmpPackage += section + ".";
+                    Object clazz = invokeClass(tmpPackage);
+                    if (clazz != null) {
+                        if (i == sections.length - 1)
+                            return clazz;
+                        cxt = clazz;
+                    }
+                } else {
+                    if (i == sections.length - 1)
+                        return field;
+                    cxt = field;
+                }
             }
         }
         return cxt;
@@ -48,7 +60,10 @@ public class ReflectionProcessor {
      */
     private Object invokeMethod(Object context, String name) {
         try {
-            Method method = context.getClass().getMethod(name);
+            Class clazz = context.getClass();
+            if (context instanceof Class)
+                clazz = (Class) context;
+            Method method = clazz.getMethod(name);
             if (!method.isAccessible())
                 method.setAccessible(true);
             return method.invoke(context);
@@ -71,9 +86,20 @@ public class ReflectionProcessor {
             if (!field.isAccessible())
                 field.setAccessible(true);
             return field.get(context);
-        } catch (ReflectiveOperationException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+
         }
         return null;
+    }
+
+    private Object invokeClass(String name) {
+        if (name.endsWith("."))
+            name = name.substring(0, name.length() - 1);
+        try {
+            return (Class) ClassLoader.getSystemClassLoader().loadClass(name);
+        } catch (ClassNotFoundException e) {
+
+            return null;
+        }
     }
 }

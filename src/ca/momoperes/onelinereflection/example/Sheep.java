@@ -2,7 +2,7 @@ package ca.momoperes.onelinereflection.example;
 
 public class Sheep extends Entity implements Colorable {
 
-    private boolean sheared;
+    public boolean sheared;
     private DyeColor color;
 
     public Sheep(boolean sheared, DyeColor color) {
