@@ -8,16 +8,11 @@ import java.util.List;
 public class ReflectionProcessor {
 
     private String line;
-    private Object context;
+    private Object context[];
 
-    public ReflectionProcessor(String line, Object context) {
+    public ReflectionProcessor(String line, Object... context) {
         this.line = line;
         this.context = context;
-    }
-
-    public ReflectionProcessor(String line) {
-        this.line = line;
-        this.context = null;
     }
 
     /**
@@ -31,8 +26,11 @@ public class ReflectionProcessor {
         String[] sections = splitUpper();
         for (int i = 0; i < sections.length; i++) {
             String section = sections[i];
-            if (section.equals("$") || section.equals("this")) {                     // Context
-                cxt = context;
+            if (section.equals("$") || section.equals("this")) {                     // Context #1
+                cxt = context[0];
+            } else if (section.startsWith("$") && section.substring(1, section.length()).matches("[0-9]+")) { // Context #X
+                int index = Integer.valueOf(section.replace("$", "")) - 1;
+                cxt = context[index];
             } else if (section.startsWith("\"") && section.endsWith("\"")) {         // String literal
                 section = section.substring(1, section.length() - 1);
                 if (i == sections.length - 1)
