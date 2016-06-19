@@ -15,6 +15,11 @@ public class ReflectionProcessor {
         this.context = context;
     }
 
+    public ReflectionProcessor(String line) {
+        this.line = line;
+        this.context = null;
+    }
+
     /**
      * Processes the given reflective line
      *

@@ -22,7 +22,7 @@ public class Main {
     }
 
     private static void staticMethodSample() {
-        System.out.println(new ReflectionProcessor("ca.momoperes.onelinereflection.example.Main.staticTest()", null).process());
+        System.out.println(new ReflectionProcessor("ca.momoperes.onelinereflection.example.Main.staticTest()").process());
     }
 
     private static void parameterSample() {
