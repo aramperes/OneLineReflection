@@ -20,7 +20,7 @@ public class Sheep extends Entity implements Colorable {
         return color;
     }
 
-    public String say(String something, Boolean alive) {
-        return "Baah! " + something + " - alive: " + alive;
+    public String say(String something, Boolean alive, Integer integer) {
+        return "Baah! " + something + " - alive: " + alive + " - integer: " + integer;
     }
 }

@@ -3,7 +3,6 @@ package ca.momoperes.onelinereflection;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ReflectionProcessor {
@@ -27,31 +26,46 @@ public class ReflectionProcessor {
         String[] sections = splitUpper();
         for (int i = 0; i < sections.length; i++) {
             String section = sections[i];
-            if (section.equals("$") || section.equals("this")) {
+            if (section.equals("$") || section.equals("this")) {                     // Context
                 cxt = context;
-            } else if (section.startsWith("\"") && section.endsWith("\"")) {
+            } else if (section.startsWith("\"") && section.endsWith("\"")) {         // String literal
                 section = section.substring(1, section.length() - 1);
                 if (i == sections.length - 1)
                     return section;
                 cxt = section;
-            } else if (section.contains("(") && section.contains(")")) { // Method
+            } else if (section.equals("true") || section.equals("false")) {          // Boolean literal
+                Boolean value = Boolean.valueOf(section);
+                if (i == sections.length - 1)
+                    return value;
+                cxt = value;
+            } else if (section.replaceAll("[0-9]+", "").equals("")) {                // Integer literal
+                Integer value = Integer.valueOf(section);
+                if (i == sections.length - 1)
+                    return value;
+                cxt = value;
+            } else if (section.replaceAll("[0-9]+", "").toLowerCase().equals("l")) { // Long literal
+                Long value = Long.valueOf(section.substring(0, section.length() - 1));
+                if (i == sections.length - 1)
+                    return value;
+                cxt = value;
+            } else if (section.contains("(") && section.contains(")")) {             // Method
                 String name = getMethodName(section);
                 String[] parameters = getMethodParams(section);
-                //System.out.println(name + " " + Arrays.toString(parameters) + " " + parameters.length);
                 if (i == sections.length - 1)
                     return invokeMethod(cxt, name, parameters);
                 cxt = invokeMethod(cxt, name, parameters);
-            } else { // Field & Class
+            } else {
                 Object field = invokeField(cxt, section);
-                if (field == null) {
+                if (field == null) {                                                 // Class
                     tmpPackage += section + ".";
                     Object clazz = invokeClass(tmpPackage);
                     if (clazz != null) {
                         if (i == sections.length - 1)
                             return clazz;
                         cxt = clazz;
+                        tmpPackage = "";
                     }
-                } else {
+                } else {                                                             // Field
                     if (i == sections.length - 1)
                         return field;
                     cxt = field;

@@ -27,7 +27,7 @@ public class Main {
 
     private static void parameterSample() {
         Sheep context = new Sheep(true, new DyeColor((byte) 12));
-        System.out.println(new ReflectionProcessor("$.say(\"a\", $.isAlive())", context).process());
+        System.out.println(new ReflectionProcessor("$.say(\"a\", false, 9000)", context).process());
     }
 
     public static String staticTest() {
