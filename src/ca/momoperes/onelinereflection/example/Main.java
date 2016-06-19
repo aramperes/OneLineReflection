@@ -8,6 +8,7 @@ public class Main {
         objectFieldSameple();
         objectMethodSample();
         staticMethodSample();
+        parameterSample();
     }
 
     private static void objectMethodSample() {
@@ -22,7 +23,11 @@ public class Main {
 
     private static void staticMethodSample() {
         System.out.println(new ReflectionProcessor("ca.momoperes.onelinereflection.example.Main.staticTest()", null).process());
+    }
 
+    private static void parameterSample() {
+        Sheep context = new Sheep(true, new DyeColor((byte) 12));
+        System.out.println(new ReflectionProcessor("$.say(\"a\", $.isAlive())", context).process());
     }
 
     public static String staticTest() {

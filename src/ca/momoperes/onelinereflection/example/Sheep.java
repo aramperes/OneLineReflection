@@ -19,4 +19,8 @@ public class Sheep extends Entity implements Colorable {
     public DyeColor getColor() {
         return color;
     }
+
+    public String say(String something, Boolean alive) {
+        return "Baah! " + something + " - alive: " + alive;
+    }
 }
