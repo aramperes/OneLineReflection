@@ -27,7 +27,7 @@ Note that `$` represents the context. You can also use `this` to access it.
 
 _____________________
 
-In another scenario, you want to execute a static method. No context is needed here, we'll leave it to `null`.
+In another scenario, you want to execute a static method. No context is needed here.
 
 In our `com.example.foo.MyClass` class, we have a static method, `public static void doSomething()`.
 
@@ -35,7 +35,7 @@ Invoking the method using the utility would be:
 
 ```java
 
-new ReflectionProcessor("com.example.foo.MyClass.doSomething()", null).process();
+new ReflectionProcessor("com.example.foo.MyClass.doSomething()").process();
 
 ```
 
