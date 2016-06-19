@@ -39,12 +39,39 @@ new ReflectionProcessor("com.example.foo.MyClass.doSomething()").process();
 
 ```
 
+_____________________
+
+If you want to use multiple variables in your string, this utility supports multi-contextuality.
+
+For example, if you have two Strings:
+
+```java
+
+String a = "Hello";
+String b = "World";
+
+```
+
+And you have a static method in `MyClass`, `public static void hello(String a, String b)`;
+
+You can pass the parameters as such:
+
+```java
+
+new ReflectionProcessor("com.example.foo.MyClass.hello($1, $2)", a, b).process();
+
+```
+
+Note that `$1` references the first context, and `$2` the second. Using `$` alone will reference the first context.
+
+
 Features
 ---
 
  - Object-oriented calls
  - Static calls
  - Fields, methods (with parameters), classes (with package), literals (String, Boolean, Integer, Long)
+ - Multi-contextual
 
 Disclaimer
 ---
