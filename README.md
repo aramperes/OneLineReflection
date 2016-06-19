@@ -39,7 +39,20 @@ new ReflectionProcessor("com.example.foo.MyClass.doSomething()", null).process()
 
 ```
 
+Features
+---
+
+ - Object-oriented calls
+ - Static calls
+ - Fields, methods (with parameters), classes (with package), literals (String, Boolean, Integer, Long)
+
 Disclaimer
 ---
 
 This is for demonstration purposes, some features you could expect might or might not be present.
+
+*Features not included*:
+
+- Decimal literals (Double, Float)
+- Short, Byte literals
+- Contructors
