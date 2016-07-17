@@ -10,6 +10,16 @@ public class ReflectionProcessor {
     private String line;
     private Object context[];
 
+    /**
+     * Creates a new reflection processor instance
+     *
+     * @param line the reflection line. The format of this line is defined by the following;
+     *             Use $ to reference the first context (equivalent to $1)
+     *             Use $x to reference a specific context, where 'x' is the index of the context (starting from 1)
+     *             To reference a static method/field call, specifying the full package is required
+     *             More info here: https://github.com/momothereal/OneLineReflection/blob/master/README.md
+     * @param context the context(s) of the reflection line
+     */
     public ReflectionProcessor(String line, Object... context) {
         this.line = line;
         this.context = context;
@@ -102,7 +112,6 @@ public class ReflectionProcessor {
             Class clazz = context.getClass();
             if (context instanceof Class)
                 clazz = (Class) context;
-            //System.out.println(name + " " + classes.length + " " + params.size());
             Method method = clazz.getMethod(name, classes);
             if (!method.isAccessible())
                 method.setAccessible(true);
@@ -126,23 +135,32 @@ public class ReflectionProcessor {
             if (!field.isAccessible())
                 field.setAccessible(true);
             return field.get(context);
-        } catch (Exception ignored) {
-
-        }
+        } catch (Exception ignored) {}
         return null;
     }
 
-    private Object invokeClass(String name) {
+    /**
+     * Invokes a class from its full-length name, including package
+     *
+     * @param name the name of the class, preceded with its package
+     * @return the specified class, null if it is non-existent
+     */
+    private Class invokeClass(String name) {
         if (name.endsWith("."))
             name = name.substring(0, name.length() - 1);
         try {
             return (Class) ClassLoader.getSystemClassLoader().loadClass(name);
         } catch (ClassNotFoundException e) {
-
             return null;
         }
     }
 
+    /**
+     * Gets the parameters inside a method parentheses enclosure
+     *
+     * @param section the method and its parameters, which are enclosed in parentheses and separated with commas (,)
+     * @return the parameters
+     */
     private String[] getMethodParams(String section) {
         int level = 0;
         boolean inString = false;
@@ -185,6 +203,12 @@ public class ReflectionProcessor {
         return parameters.toArray(new String[parameters.size()]);
     }
 
+    /**
+     * Gets the name of a method from a segment
+     *
+     * @param section the segment containing the method (including parentheses)
+     * @return the name of the method
+     */
     private String getMethodName(String section) {
         StringBuilder builder = new StringBuilder();
         for (char c : section.toCharArray()) {
@@ -211,7 +235,6 @@ public class ReflectionProcessor {
             if (c == ')') {
                 level--;
             }
-
             current += c;
         }
         if (!current.equals(""))
