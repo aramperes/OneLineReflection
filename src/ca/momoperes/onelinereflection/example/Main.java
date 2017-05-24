@@ -10,6 +10,11 @@ public class Main {
         staticMethodSample();
         parameterSample();
         multicontextualSample();
+        enumSample();
+    }
+
+    private static void enumSample() {
+        System.out.println(new ReflectionProcessor("ca.momoperes.onelinereflection.example.AnEnum.SOMETHING.getString()").process());
     }
 
     private static void objectMethodSample() {

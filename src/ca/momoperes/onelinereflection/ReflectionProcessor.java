@@ -8,16 +8,16 @@ import java.util.List;
 public class ReflectionProcessor {
 
     private String line;
-    private Object context[];
+    private Object[] context;
 
     /**
      * Creates a new reflection processor instance
      *
-     * @param line the reflection line. The format of this line is defined by the following;
-     *             Use $ to reference the first context (equivalent to $1)
-     *             Use $x to reference a specific context, where 'x' is the index of the context (starting from 1)
-     *             To reference a static method/field call, specifying the full package is required
-     *             More info here: https://github.com/momothereal/OneLineReflection/blob/master/README.md
+     * @param line    the reflection line. The format of this line is defined by the following;
+     *                Use $ to reference the first context (equivalent to $1)
+     *                Use $x to reference a specific context, where 'x' is the index of the context (starting from 1)
+     *                To reference a static method/field call, specifying the full package is required
+     *                More info here: https://github.com/momothereal/OneLineReflection/blob/master/README.md
      * @param context the context(s) of the reflection line
      */
     public ReflectionProcessor(String line, Object... context) {
@@ -95,7 +95,7 @@ public class ReflectionProcessor {
      * @param name    the name of the method
      * @return the invokation's return value
      */
-    private Object invokeMethod(Object context, String name, String[] parameters) {
+    private Object invokeMethod(Object context, String name, String... parameters) {
         try {
             ArrayList<Object> params = new ArrayList<>();
             for (String parameter : parameters) {
@@ -112,12 +112,54 @@ public class ReflectionProcessor {
             Class clazz = context.getClass();
             if (context instanceof Class)
                 clazz = (Class) context;
-            Method method = clazz.getMethod(name, classes);
+            Method method = getMethod(name, clazz, classes);
             if (!method.isAccessible())
                 method.setAccessible(true);
             return method.invoke(context, params.toArray(new Object[params.size()]));
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
+        }
+        return null;
+    }
+
+    private Method getMethod(String name, Class clazz, Class... parameters) {
+        try {
+            return clazz.getMethod(name, parameters);
+        } catch (NoSuchMethodException e) {
+            for (Method method : clazz.getMethods()) {
+                if (!method.getName().equals(name)) {
+                    continue;
+                }
+                if (method.getParameterCount() != parameters.length) {
+                    continue;
+                }
+                boolean matches = true;
+                a:
+                for (Class<?> param : method.getParameterTypes()) {
+                    for (Class p : parameters) {
+                        if (!p.equals(param)) {
+                            matches = false;
+                            break a;
+                        }
+                    }
+                }
+                if (matches) {
+                    return method;
+                }
+                matches = true;
+                b:
+                for (Class<?> param : method.getParameterTypes()) {
+                    for (Class p : parameters) {
+                        if (!param.isAssignableFrom(p)) {
+                            matches = false;
+                            break b;
+                        }
+                    }
+                }
+                if (matches) {
+                    return method;
+                }
+            }
         }
         return null;
     }
@@ -135,7 +177,18 @@ public class ReflectionProcessor {
             if (!field.isAccessible())
                 field.setAccessible(true);
             return field.get(context);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            // is it an enum?
+            if (context != null && context instanceof Class) {
+                boolean isEnum = ((Class) context).isEnum();
+                if (isEnum) {
+                    try {
+                        return getMethod("valueOf", (Class) context, String.class).invoke(null, name);
+                    } catch (Exception ignored1) {
+                    }
+                }
+            }
+        }
         return null;
     }
 
